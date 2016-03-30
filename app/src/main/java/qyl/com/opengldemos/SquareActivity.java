@@ -7,6 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import qyl.com.opengldemos.shape.Cube;
 import qyl.com.opengldemos.shape.FlatColoredSquare;
+import qyl.com.opengldemos.shape.Icosahedrons;
 import qyl.com.opengldemos.shape.SimplePlane;
 import qyl.com.opengldemos.shape.SmoothColoredSquare;
 import qyl.com.opengldemos.shape.Square;
@@ -25,6 +26,8 @@ public class SquareActivity extends HelloWorld {
     private Cube cube;
 
     private SimplePlane simplePlane;
+
+    private Icosahedrons icosahedrons;
 
     private int angle = 0;
 
@@ -47,6 +50,8 @@ public class SquareActivity extends HelloWorld {
 
         // Add the plane to the renderer.
         //renderer.addMesh(plane);
+        icosahedrons = new Icosahedrons();
+
     }
 
     @Override
@@ -60,7 +65,7 @@ public class SquareActivity extends HelloWorld {
         // Rotate square A counter-clockwise.
         gl.glRotatef(angle, 0, 1, 1);
         // Draw square A.
-        simplePlane.draw(gl);
+        icosahedrons.draw(gl);
         gl.glPopMatrix();
 
         //square2
