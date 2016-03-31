@@ -11,6 +11,7 @@ import qyl.com.opengldemos.shape.Icosahedrons;
 import qyl.com.opengldemos.shape.SimplePlane;
 import qyl.com.opengldemos.shape.SmoothColoredSquare;
 import qyl.com.opengldemos.shape.Square;
+import qyl.com.opengldemos.shape.Star;
 
 /**
  * Created by qiuyunlong on 16/3/27.
@@ -28,6 +29,8 @@ public class SquareActivity extends HelloWorld {
     private SimplePlane simplePlane;
 
     private Icosahedrons icosahedrons;
+
+    private Star star;
 
     private int angle = 0;
 
@@ -52,6 +55,8 @@ public class SquareActivity extends HelloWorld {
         //renderer.addMesh(plane);
         icosahedrons = new Icosahedrons();
 
+        star = new Star();
+
     }
 
     @Override
@@ -65,6 +70,7 @@ public class SquareActivity extends HelloWorld {
         // Rotate square A counter-clockwise.
         gl.glRotatef(angle, 0, 1, 1);
         // Draw square A.
+        star.draw(gl);
         icosahedrons.draw(gl);
         gl.glPopMatrix();
 
