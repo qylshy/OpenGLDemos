@@ -1,7 +1,12 @@
 package qyl.com.opengldemos;
 
 import android.graphics.BitmapFactory;
+import android.opengl.GLU;
 import android.os.Bundle;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -10,6 +15,7 @@ import qyl.com.opengldemos.shape.FlatColoredSquare;
 import qyl.com.opengldemos.shape.Icosahedrons;
 import qyl.com.opengldemos.shape.SimplePlane;
 import qyl.com.opengldemos.shape.SmoothColoredSquare;
+import qyl.com.opengldemos.shape.Sphere;
 import qyl.com.opengldemos.shape.Square;
 import qyl.com.opengldemos.shape.Star;
 
@@ -31,6 +37,8 @@ public class SquareActivity extends HelloWorld {
     private Icosahedrons icosahedrons;
 
     private Star star;
+
+    private Sphere sphere;
 
     private int angle = 0;
 
@@ -57,6 +65,8 @@ public class SquareActivity extends HelloWorld {
 
         star = new Star();
 
+        sphere = new Sphere();
+
     }
 
     @Override
@@ -64,6 +74,7 @@ public class SquareActivity extends HelloWorld {
         super.DrawScene(gl);
         gl.glLoadIdentity();
         gl.glTranslatef(0.0f, 0.0f, -10.0f);
+        //initScene(gl);
 
         //square1
         gl.glPushMatrix();
@@ -83,6 +94,7 @@ public class SquareActivity extends HelloWorld {
         gl.glScalef(.5f, .5f, .5f);
         // Draw square B.
         mSquare2.draw(gl);
+        //sphere.draw(gl);
 
         //square3
         gl.glPushMatrix();
@@ -100,6 +112,59 @@ public class SquareActivity extends HelloWorld {
         gl.glPopMatrix();
         // Increse the angle.
         angle++;
+    }
+
+    public void initScene(GL10 gl){
+        float[] amb = { 1.0f, 1.0f, 1.0f, 1.0f, };
+        float[] diff = { 1.0f, 1.0f, 1.0f, 1.0f, };
+        float[] spec = { 1.0f, 1.0f, 1.0f, 1.0f, };
+        float[] pos = { 0.0f, 5.0f, 5.0f, 1.0f, };
+        float[] spot_dir = { 0.0f, -1.0f, 0.0f, };
+        gl.glEnable(GL10.GL_DEPTH_TEST);
+        gl.glEnable(GL10.GL_CULL_FACE);
+        gl.glEnable(GL10.GL_LIGHTING);
+        gl.glEnable(GL10.GL_LIGHT0);
+        ByteBuffer abb
+                = ByteBuffer.allocateDirect(amb.length*4);
+        abb.order(ByteOrder.nativeOrder());
+        FloatBuffer ambBuf = abb.asFloatBuffer();
+        ambBuf.put(amb);
+        ambBuf.position(0);
+        ByteBuffer dbb
+                = ByteBuffer.allocateDirect(diff.length*4);
+        dbb.order(ByteOrder.nativeOrder());
+        FloatBuffer diffBuf = dbb.asFloatBuffer();
+        diffBuf.put(diff);
+        diffBuf.position(0);
+        ByteBuffer sbb
+                = ByteBuffer.allocateDirect(spec.length*4);
+        sbb.order(ByteOrder.nativeOrder());
+        FloatBuffer specBuf = sbb.asFloatBuffer();
+        specBuf.put(spec);
+        specBuf.position(0);
+        ByteBuffer pbb
+                = ByteBuffer.allocateDirect(pos.length*4);
+        pbb.order(ByteOrder.nativeOrder());
+        FloatBuffer posBuf = pbb.asFloatBuffer();
+        posBuf.put(pos);
+        posBuf.position(0);
+        ByteBuffer spbb
+                = ByteBuffer.allocateDirect(spot_dir.length*4);
+        spbb.order(ByteOrder.nativeOrder());
+        FloatBuffer spot_dirBuf = spbb.asFloatBuffer();
+        spot_dirBuf.put(spot_dir);
+        spot_dirBuf.position(0);
+        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, ambBuf);
+        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, diffBuf);
+        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, specBuf);
+        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, posBuf);
+        gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPOT_DIRECTION,
+                spot_dirBuf);
+        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_EXPONENT, 0.0f);
+        gl.glLightf(GL10.GL_LIGHT0, GL10.GL_SPOT_CUTOFF, 45.0f);
+        gl.glLoadIdentity();
+        GLU.gluLookAt(gl, 0.0f, 4.0f, 4.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f);
     }
 
     @Override
