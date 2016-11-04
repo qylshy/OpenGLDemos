@@ -8,6 +8,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import qyl.com.opengldemos.es2guide.render.AirHockeyRender2;
 import qyl.com.opengldemos.es2guide.render.AirHockeyRenderer;
 
 /**
@@ -36,7 +37,7 @@ public class FirstOpenGLProjectActivity extends Activity {
             // Request an OpenGL ES 2.0 compatible context. glSurfaceView.setEGLContextClientVersion(2);
             // Assign our renderer.
             glSurfaceView.setEGLContextClientVersion(2);
-            glSurfaceView.setRenderer(new AirHockeyRenderer(this));
+            glSurfaceView.setRenderer(new AirHockeyRender2(this));
             rendererSet = true;
         } else {
             Toast.makeText(this, "This device does not support OpenGL ES 2.0.", Toast.LENGTH_LONG).show();
