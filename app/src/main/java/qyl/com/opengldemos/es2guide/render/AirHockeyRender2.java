@@ -28,8 +28,12 @@ import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;
 import static android.opengl.GLES20.glUniform4f;
+import static android.opengl.GLES20.glUniform4fv;
+import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glUseProgram;
 import static android.opengl.GLES20.glVertexAttribPointer;
+import static android.opengl.GLES20.glViewport;
+import static android.opengl.Matrix.orthoM;
 
 /**
  * Created by qiuyunlong on 16/11/3.
@@ -54,6 +58,10 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
     private static final int STRIDE = (POSITION_COMPONENT_COUNT + COLOR_COMPONENT_COUNT) * BYTES_PER_FLOAT;
 
     private int aColorLocation;
+
+    private static final String U_MATRIX = "u_Matrix";
+    private float[] projectionMatrix = new float[16];
+    private int uMatrixLocation;
 
 
     public AirHockeyRender2() {
@@ -91,19 +99,19 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
         float[] tableVerticesWithTriangles = {
                 //order of coordinates: x, y, r, g, b
                 0,       0,       1f,    1f,    1f,
-                -0.5f,   -0.5f,   0.7f,  0.7f,  0.7f,
-                0.5f,    -0.5f,   0.7f,  0.7f,  0.7f,
-                0.5f,    0.5f,    0.7f,  0.7f,  0.7f,
-                -0.5f,   0.5f,    0.7f,  0.7f,  0.7f,
-                -0.5f,   -0.5f,   0.7f,  0.7f,  0.7f,
+                -0.5f,   -0.8f,   0.7f,  0.7f,  0.7f,
+                0.5f,    -0.8f,   0.7f,  0.7f,  0.7f,
+                0.5f,    0.8f,    0.7f,  0.7f,  0.7f,
+                -0.5f,   0.8f,    0.7f,  0.7f,  0.7f,
+                -0.5f,   -0.8f,   0.7f,  0.7f,  0.7f,
 
                 // Line 1
                 -0.5f, 0f,  1f,  0f, 0f,
                 0.5f, 0f,   1f,  0f, 0f,
 
                 // Mallets
-                0f, -0.25f, 0f,  0f, 1f,
-                0f,  0.25f, 1f,  0f, 0f
+                0f, -0.4f, 0f,  0f, 1f,
+                0f,  0.4f, 1f,  0f, 0f
         };
 
         vertexData = ByteBuffer.allocateDirect(tableVerticesWithTriangles.length * BYTES_PER_FLOAT)
@@ -143,10 +151,24 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
         vertexData.position(POSITION_COMPONENT_COUNT);
         glVertexAttribPointer(aColorLocation, COLOR_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, vertexData);
         glEnableVertexAttribArray(aColorLocation);
+
+        uMatrixLocation = glGetUniformLocation(program, U_MATRIX);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        glViewport(0, 0, width, height);
+
+        float aspectRatio = width > height ? (float)width / (float)height : (float) height / (float) width;
+
+        if (width > height) {
+            //LandScape
+            orthoM(projectionMatrix, 0, -aspectRatio, aspectRatio, -1f, 1f, -1f, 1f);
+        } else {
+            //portrait or square
+            orthoM(projectionMatrix, 0, -1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
+
+        }
 
     }
 
@@ -154,6 +176,8 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
         // Clear the rendering surface.
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUniformMatrix4fv(uMatrixLocation, 1, false, projectionMatrix, 0);
 
         //glUniform4f(uColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
