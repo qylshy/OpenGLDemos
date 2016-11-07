@@ -12,6 +12,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import qyl.com.opengldemos.R;
 import qyl.com.opengldemos.es2guide.util.LoggerConfig;
+import qyl.com.opengldemos.es2guide.util.MatrixHelper;
 import qyl.com.opengldemos.es2guide.util.ShaderHelper;
 import qyl.com.opengldemos.es2guide.util.TextResourceReader;
 
@@ -33,7 +34,12 @@ import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glUseProgram;
 import static android.opengl.GLES20.glVertexAttribPointer;
 import static android.opengl.GLES20.glViewport;
+import static android.opengl.Matrix.multiplyMM;
 import static android.opengl.Matrix.orthoM;
+import static android.opengl.Matrix.rotateM;
+import static android.opengl.Matrix.scaleM;
+import static android.opengl.Matrix.setIdentityM;
+import static android.opengl.Matrix.translateM;
 
 /**
  * Created by qiuyunlong on 16/11/3.
@@ -41,7 +47,7 @@ import static android.opengl.Matrix.orthoM;
 
 public class AirHockeyRender2 implements GLSurfaceView.Renderer {
 
-    private static final int POSITION_COMPONENT_COUNT = 2;
+    private static final int POSITION_COMPONENT_COUNT = 4;
 
     private static final int BYTES_PER_FLOAT = 4;
     private FloatBuffer vertexData;
@@ -62,6 +68,8 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
     private static final String U_MATRIX = "u_Matrix";
     private float[] projectionMatrix = new float[16];
     private int uMatrixLocation;
+
+    private final float[] modelMatrix = new float[16];
 
 
     public AirHockeyRender2() {
@@ -97,21 +105,21 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
         };*/
 
         float[] tableVerticesWithTriangles = {
-                //order of coordinates: x, y, r, g, b
-                0,       0,       1f,    1f,    1f,
-                -0.5f,   -0.8f,   0.7f,  0.7f,  0.7f,
-                0.5f,    -0.8f,   0.7f,  0.7f,  0.7f,
-                0.5f,    0.8f,    0.7f,  0.7f,  0.7f,
-                -0.5f,   0.8f,    0.7f,  0.7f,  0.7f,
-                -0.5f,   -0.8f,   0.7f,  0.7f,  0.7f,
+                //order of coordinates: x, y, z, w, r, g, b
+                0,       0,       0,     1.5f,     1f,    1f,    1f,
+                -0.5f,   -0.8f,   0,     1f,       0.7f,  0.7f,  0.7f,
+                0.5f,    -0.8f,   0,     1f,       0.7f,  0.7f,  0.7f,
+                0.5f,    0.8f,    0,     2f,       0.7f,  0.7f,  0.7f,
+                -0.5f,   0.8f,    0,     2f,       0.7f,  0.7f,  0.7f,
+                -0.5f,   -0.8f,   0,     1f,       0.7f,  0.7f,  0.7f,
 
                 // Line 1
-                -0.5f, 0f,  1f,  0f, 0f,
-                0.5f, 0f,   1f,  0f, 0f,
+                -0.5f, 0f,  0f,  1.5f,   1f,  0f, 0f,
+                0.5f, 0f,   0f,  1.5f,   1f,  0f, 0f,
 
                 // Mallets
-                0f, -0.4f, 0f,  0f, 1f,
-                0f,  0.4f, 1f,  0f, 0f
+                0f, -0.4f, 0f,   1.25f,   0f,  0f, 1f,
+                0f,  0.4f, 0f,   1.75f,   1f,  0f, 0f
         };
 
         vertexData = ByteBuffer.allocateDirect(tableVerticesWithTriangles.length * BYTES_PER_FLOAT)
@@ -159,7 +167,7 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         glViewport(0, 0, width, height);
 
-        float aspectRatio = width > height ? (float)width / (float)height : (float) height / (float) width;
+        /*float aspectRatio = width > height ? (float)width / (float)height : (float) height / (float) width;
 
         if (width > height) {
             //LandScape
@@ -168,7 +176,18 @@ public class AirHockeyRender2 implements GLSurfaceView.Renderer {
             //portrait or square
             orthoM(projectionMatrix, 0, -1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
 
-        }
+        }*/
+
+        MatrixHelper.perspectiveM(projectionMatrix, 45f, (float)width / (float)height, 1f, 10f);
+
+        setIdentityM(modelMatrix, 0);
+        translateM(modelMatrix, 0, 0f, 0f, -2.5f);
+        rotateM(modelMatrix, 0, -60f, 1f, 0f, 0f);
+
+        float[] temp = new float[16];
+        multiplyMM(temp, 0, projectionMatrix, 0, modelMatrix, 0);
+        System.arraycopy(temp, 0, projectionMatrix, 0, temp.length);
+
 
     }
 
